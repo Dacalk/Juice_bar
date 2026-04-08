@@ -53,7 +53,8 @@ router.post('/auth/login', async (req, res) => {
     const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET || 'secret');
     res.send({ access_token: token, user: { id: user._id, username: user.username, role: user.role } });
   } catch (error) {
-    res.status(400).send(error);
+    console.error('Login error:', error);
+    res.status(400).send({ error: error.message });
   }
 });
 
@@ -73,7 +74,8 @@ router.post('/auth/register', async (req, res) => {
     await user.save();
     res.status(201).send({ message: 'User created successfully', user: { id: user._id, username: user.username, role: user.role } });
   } catch (error) {
-    res.status(400).send(error);
+    console.error('Registration error:', error);
+    res.status(400).send({ error: error.message });
   }
 });
 
