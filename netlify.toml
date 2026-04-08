@@ -1,6 +1,10 @@
 [build]
-  command = "cd Frontend && npm run build"
+  command = "npm run build"
   publish = "Frontend/dist"
+
+[build.environment]
+  NPM_FLAGS = "--include=dev"
+  NODE_VERSION = "20"
 
 [functions]
   directory = "Backend/netlify/functions"
