@@ -15,18 +15,21 @@ const seedAdmin = async () => {
     await mongoose.connect(uri);
     console.log('Connected to MongoDB');
 
+    const hashedPassword = await bcrypt.hash('admin123', 8);
+    const adminData = {
+      username: 'admin',
+      password: hashedPassword,
+      role: 'admin'
+    };
+
     const existingAdmin = await User.findOne({ username: 'admin' });
-    if (existingAdmin) {
-      console.log('Admin user already exists');
-    } else {
-      const hashedPassword = await bcrypt.hash('admin123', 8);
-      const admin = new User({
-        username: 'admin',
-        password: hashedPassword,
-        role: 'admin'
-      });
+    if (!existingAdmin) {
+      const admin = new User(adminData);
       await admin.save();
       console.log('Admin user created successfully (username: admin, password: admin123)');
+    } else {
+      await User.updateOne({ username: 'admin' }, { $set: { password: hashedPassword } });
+      console.log('Admin user repaired: Password has been reset');
     }
 
     // Seed sample products if none exist
