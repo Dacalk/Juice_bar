@@ -57,6 +57,26 @@ router.post('/auth/login', async (req, res) => {
   }
 });
 
+router.post('/auth/register', async (req, res) => {
+  try {
+    const { username, password, role } = req.body;
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
+      return res.status(400).send({ error: 'Username already exists' });
+    }
+    const hashedPassword = await bcrypt.hash(password, 8);
+    const user = new User({
+      username,
+      password: hashedPassword,
+      role: role || 'cashier'
+    });
+    await user.save();
+    res.status(201).send({ message: 'User created successfully', user: { id: user._id, username: user.username, role: user.role } });
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
 // --- User Endpoints ---
 
 router.get('/users', auth, async (req, res) => {
@@ -173,6 +193,51 @@ router.post('/orders', auth, async (req, res) => {
   } catch (error) {
     console.error('Order creation error:', error);
     res.status(400).send({ error: error.message });
+  }
+});
+
+// --- Report Endpoints ---
+
+router.get('/reports/daily', auth, async (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).send({ error: 'Access denied' });
+  
+  try {
+    const { start_date, end_date } = req.query;
+    let query = {};
+    
+    if (start_date || end_date) {
+      query.timestamp = {};
+      if (start_date) query.timestamp.$gte = new Date(start_date);
+      if (end_date) {
+        const end = new Date(end_date);
+        end.setHours(23, 59, 59, 999);
+        query.timestamp.$lte = end;
+      }
+    } else {
+      // Default to today
+      const start = new Date();
+      start.setHours(0, 0, 0, 0);
+      const end = new Date();
+      end.setHours(23, 59, 59, 999);
+      query.timestamp = { $gte: start, $lte: end };
+    }
+
+    const orders = await Order.find(query).sort({ timestamp: -1 });
+    
+    const stats = orders.reduce((acc, order) => {
+      acc.total_sales += order.total;
+      acc.total_cost += order.cost;
+      acc.total_profit += order.profit;
+      return acc;
+    }, { total_sales: 0, total_cost: 0, total_profit: 0 });
+
+    res.send({
+      ...stats,
+      num_orders: orders.length,
+      orders
+    });
+  } catch (error) {
+    res.status(500).send({ error: error.message });
   }
 });
 
