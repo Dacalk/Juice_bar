@@ -176,8 +176,9 @@ router.post('/orders', auth, async (req, res) => {
   }
 });
 
+app.use('/.netlify/functions/api', router);
+app.use('/api', router);
 app.use('/', router);
-// Netlify will handle the /.netlify/functions/api prefix
 
 // Export app for local dev
 module.exports = app;
