@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #ff6b00;
+  --color-secondary: #2ecc71;
+  --font-sans: "Inter", system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+:root {
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  @apply bg-slate-50 text-slate-900 w-full;
+}
+
+/* Scoped Resto Dark Theme */
+.resto-theme {
+  --resto-dark: #121212;
+  --resto-mesh-pattern: radial-gradient(#ffffff08 1px, transparent 1px);
+  --primary-gradient: linear-gradient(135deg, #eaf89b 0%, #c5eef5 100%);
+  background-color: var(--resto-dark);
+  background-image: var(--resto-mesh-pattern);
+  background-size: 24px 24px;
+  color: #fff;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.resto-theme .glass-panel {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+/* Global — works inside modals/overlays outside .resto-theme */
+.resto-gradient {
+  background: linear-gradient(135deg, #eaf89b 0%, #c5eef5 100%);
+}
+
+.resto-theme .resto-gradient {
+  background: var(--primary-gradient);
+}
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-primary {
+    @apply bg-primary/90 text-white shadow-md hover:shadow-lg;
+  }
+
+  .btn-secondary {
+    @apply bg-white border-2 border-primary text-primary hover:bg-primary hover:text-white;
+  }
+
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-slate-100 p-4 transition-all hover:shadow-md;
+  }
+
+  .input {
+    @apply w-full px-4 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all;
+  }
+}
+
+/* Specific centering for Login/Register Pages ONLY */
+.auth-page-root {
+  @apply w-full min-h-screen flex items-center justify-center;
+}
+
+@media print {
+  body {
+    background: rgb(249, 146, 146) !important;
+    color: rgb(45, 33, 33) !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+}
